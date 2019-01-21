@@ -1,4 +1,4 @@
-package com.maxis7567.msvolley;
+package com.maxis7567.example;
 
 import com.google.gson.annotations.SerializedName;
 
