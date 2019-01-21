@@ -3,7 +3,6 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.maxis7567.msvolley">
 
-    <dist:module dist:instant="true" />
 
     <application
         android:allowBackup="true"
