@@ -1,10 +1,13 @@
 package com.maxis7567.msvolley;
 
-import com.android.volley.AuthFailureError;
+
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.ParseError;
 import com.google.gson.Gson;
 
 import java.io.UnsupportedEncodingException;
@@ -77,6 +80,7 @@ public class JsonRequest<T> extends Request<T> {
             return super.getBody();
         }else
             return body.getBytes();
+
     }
 
 }

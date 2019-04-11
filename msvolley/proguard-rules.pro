@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keepclassmembers,allowshrinking,allowobfuscation class com.android.volley.NetworkDispatcher {
+    void processRequest();
+}
+-keepclassmembers,allowshrinking,allowobfuscation class com.android.volley.CacheDispatcher {
+    void processRequest();
+}

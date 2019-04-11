@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.maxis7567.msvolley'
 android {
     compileSdkVersion 28
 
@@ -18,7 +16,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -26,8 +25,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.android.volley:volley:1.1.1'
-}
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
 
+
+}
