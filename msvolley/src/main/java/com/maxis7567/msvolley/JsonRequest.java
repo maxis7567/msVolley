@@ -8,7 +8,9 @@ import com.android.volley.Response;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.ParseError;
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -58,6 +60,8 @@ public class JsonRequest<T> extends Request<T> {
             return Response.success(respone, null);
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
+        }catch (JsonParseException e){
+            return Response.error(new VolleyError(e.getMessage()));
         }
     }
 
