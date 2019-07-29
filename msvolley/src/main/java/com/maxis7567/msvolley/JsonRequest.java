@@ -73,8 +73,15 @@ public class JsonRequest<T, E> extends Request<T> {
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         try {
             String stringResponse = new String(response.data, "UTF-8");
-            T respone = gson.fromJson(stringResponse, type);
-            return Response.success(respone, null);
+            T respond;
+            if (type==String.class){
+                respond= (T) stringResponse;
+                return Response.success(respond, null);
+            }else {
+              respond=gson.fromJson(stringResponse, type);
+                return Response.success(respond, null);
+            }
+
         } catch (UnsupportedEncodingException e) {
             localError.error(e.toString());
             return null;
@@ -86,15 +93,27 @@ public class JsonRequest<T, E> extends Request<T> {
     @Override
     protected VolleyError parseNetworkError(VolleyError volleyError) {
         if (volleyError.networkResponse!=null) {
-            String stringResponse = null;
+            String stringResponse;
             try {
                 stringResponse = new String(volleyError.networkResponse.data, "UTF-8");
+                E respond;
+                if (errType==String.class){
+                    respond= (E) stringResponse;
+                    RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
+                    responseError.error(error);
+                }else {
+                    respond=gson.fromJson(stringResponse, type);
+                    RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
+                    responseError.error(error);
+                }
+
             } catch (UnsupportedEncodingException e) {
                 localError.error(e.getMessage());
+            }catch (JsonParseException e){
+                localError.error(e.toString());
             }
-            E respone = gson.fromJson(stringResponse, errType);
-            RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respone);
-            responseError.error(error);
+
+
         }else {
             localError.error(volleyError.toString());
         }

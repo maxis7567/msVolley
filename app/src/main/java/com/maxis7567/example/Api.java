@@ -20,12 +20,12 @@ import java.util.List;
 
 
 public class Api {
-    public static void getBrandModel(Context context, Respond<BrandModel> DataListener, ResponseError<PhpLaravelError> errorRespondError, LocalError localError){
+    public static void getBrandModel(Context context, Respond<String> DataListener, ResponseError<String> errorRespondError, LocalError localError){
         HashMap<String,String> header=new HashMap<>();
         header.put("Accept", "application/json");
-        JsonRequest<BrandModel,PhpLaravelError> getBrand=new JsonRequest<>(JsonRequest.Method.POST,
+        JsonRequest<String,String> getBrand=new JsonRequest<>(JsonRequest.Method.POST,
                 "https://bejato.com/api/v1/login",header,
-                BrandModel.class,PhpLaravelError.class
+                String.class,String.class
                 , DataListener,errorRespondError,localError);
         RequestQueueContainer.add(context,getBrand,localError);
     }

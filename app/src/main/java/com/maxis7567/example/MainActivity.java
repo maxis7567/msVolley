@@ -18,15 +18,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Api.getBrandModel(this, new Respond<BrandModel>() {
+        Api.getBrandModel(this, new Respond<String>() {
             @Override
-            public void respond(BrandModel respond) {
+            public void respond(String respond) {
 
             }
-        }, new ResponseError<PhpLaravelError>() {
+        }, new ResponseError<String>() {
             @Override
-            public void error(RespondError<PhpLaravelError> error) {
-              String a=  error.getRespond().getErrors().get("mobile").getAsString();
+            public void error(RespondError<String> error) {
+
             }
         }, new LocalError() {
             @Override
