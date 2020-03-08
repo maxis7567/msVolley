@@ -1,7 +1,8 @@
 package com.maxis7567.msvolley;
 
 
-import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 
@@ -15,9 +16,11 @@ import com.google.gson.JsonParseException;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class JsonRequest<T, E> extends Request<T> {
+
     private final Respond<T> responseListener;
     private ResponseError<E> responseError;
     private LocalError localError;
@@ -37,6 +40,7 @@ public class JsonRequest<T, E> extends Request<T> {
         this.localError = localError;
         body = null;
         header = null;
+        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
 
     public JsonRequest(int method, String url, String body, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
@@ -48,6 +52,7 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseError = responseError;
         this.localError = localError;
         header = null;
+        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
     public JsonRequest(int method, String url, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
         super(method, url, null);
@@ -57,6 +62,7 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
+        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
     public JsonRequest(int method, String url, String body, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
         super(method, url, null);
@@ -67,25 +73,25 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
+        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
 
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
+
         try {
-            String stringResponse = new String(response.data, "UTF-8");
+            String stringResponse = new String(response.data, StandardCharsets.UTF_8);
+            Log.d("MSVolley", stringResponse);
             T respond;
             if (type==String.class){
                 respond= (T) stringResponse;
                 return Response.success(respond, null);
             }else {
-              respond=gson.fromJson(stringResponse, type);
+                respond=gson.fromJson(stringResponse, type);
                 return Response.success(respond, null);
             }
 
-        } catch (UnsupportedEncodingException e) {
-            localError.error(e.toString());
-            return null;
-        }catch (JsonParseException e){
+        } catch (JsonParseException e){
             localError.error(e.toString());
             return null;
         }
@@ -95,27 +101,25 @@ public class JsonRequest<T, E> extends Request<T> {
         if (volleyError.networkResponse!=null) {
             String stringResponse;
             try {
-                stringResponse = new String(volleyError.networkResponse.data, "UTF-8");
+                stringResponse = new String(volleyError.networkResponse.data, StandardCharsets.UTF_8);
                 E respond;
                 if (errType==String.class){
                     respond= (E) stringResponse;
                     RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
                     responseError.error(error);
                 }else {
-                    respond=gson.fromJson(stringResponse, type);
+                    respond=gson.fromJson(stringResponse, errType);
                     RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
                     responseError.error(error);
                 }
-
-            } catch (UnsupportedEncodingException e) {
-                localError.error(e.getMessage());
-            }catch (JsonParseException e){
+                Log.d("MSVolley",new String(volleyError.networkResponse.data));
+            } catch (JsonParseException e){
                 localError.error(e.toString());
             }
 
 
         }else {
-            localError.error(volleyError.toString());
+            localError.error("network not available");
         }
         return null;
     }
@@ -142,6 +146,7 @@ public class JsonRequest<T, E> extends Request<T> {
             return body.getBytes();
 
     }
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.maxis7567.example;
 
+
 import com.google.gson.annotations.SerializedName;
 
 public class BrandModel {

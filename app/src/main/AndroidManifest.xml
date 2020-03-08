@@ -5,7 +5,9 @@
 <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name="com.maxis7567.msvolley.uploder.Initializer"
         android:allowBackup="true"
+        android:networkSecurityConfig="@xml/net_policies"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
