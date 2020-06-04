@@ -18,7 +18,7 @@ public class Initializer extends Application {
         // Gradle automatically generates proper variable as below.
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
         // Or, you can define it manually.
-        UploadService.NAMESPACE = "com.yourcompany.yourapp";
+//        UploadService.NAMESPACE = "com.yourcompany.yourapp";
         OkHttpClient client = new OkHttpClient(); // create your own OkHttp client
         UploadService.HTTP_STACK = new OkHttpStack(client); // make the library use your own OkHttp client
     }

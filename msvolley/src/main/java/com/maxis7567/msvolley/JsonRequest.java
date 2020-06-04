@@ -1,9 +1,13 @@
 package com.maxis7567.msvolley;
 
 
-import android.os.Build;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 
 import com.android.volley.Request;
@@ -13,6 +17,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -31,7 +36,7 @@ public class JsonRequest<T, E> extends Request<T> {
     private Type errType;
 
 
-    public JsonRequest(int method, String url, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
+    public JsonRequest( int method, String url, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.type = type;
         this.errType = errType;
@@ -40,10 +45,11 @@ public class JsonRequest<T, E> extends Request<T> {
         this.localError = localError;
         body = null;
         header = null;
-        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
+        this.setRetryPolicy(new DefaultRetryPolicy(15000,3,2000));
+        Log.d("Api Call", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
 
-    public JsonRequest(int method, String url, String body, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
+    public JsonRequest( int method, String url, String body, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.body = body;
         this.type = type;
@@ -52,9 +58,10 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseError = responseError;
         this.localError = localError;
         header = null;
-        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
+        this.setRetryPolicy(new DefaultRetryPolicy(15000,3,2000));
+        Log.d("Api Call", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
-    public JsonRequest(int method, String url, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
+    public JsonRequest( int method, String url, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.header = header;
         this.type = type;
@@ -62,9 +69,10 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
-        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
+        this.setRetryPolicy(new DefaultRetryPolicy(15000,3,2000));
+        Log.d("Api Call", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
-    public JsonRequest(int method, String url, String body, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError,LocalError localError) {
+    public JsonRequest( int method, String url, String body, Map<String, String> header, Type type, Type errType, Respond<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.body = body;
         this.header = header;
@@ -73,15 +81,16 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
-        Log.d("MSVolley", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
+        this.setRetryPolicy(new DefaultRetryPolicy(15000,3,2000));
+        Log.d("Api Call", "JsonRequest() called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]\n, responseListener = [" + responseListener + "], responseError = [" + responseError + "], localError = [" + localError + "]");
     }
 
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
 
         try {
-            String stringResponse = new String(response.data, StandardCharsets.UTF_8);
-            Log.d("MSVolley", stringResponse);
+            String stringResponse = new String(response.data, "UTF-8");
+            Log.d("Api Response", stringResponse);
             T respond;
             if (type==String.class){
                 respond= (T) stringResponse;
@@ -91,7 +100,7 @@ public class JsonRequest<T, E> extends Request<T> {
                 return Response.success(respond, null);
             }
 
-        } catch (JsonParseException e){
+        } catch (JsonParseException | UnsupportedEncodingException e){
             localError.error(e.toString());
             return null;
         }
@@ -100,8 +109,9 @@ public class JsonRequest<T, E> extends Request<T> {
     protected VolleyError parseNetworkError(VolleyError volleyError) {
         if (volleyError.networkResponse!=null) {
             String stringResponse;
+            Log.d("Api Response",new String(volleyError.networkResponse.data));
             try {
-                stringResponse = new String(volleyError.networkResponse.data, StandardCharsets.UTF_8);
+                stringResponse = new String(volleyError.networkResponse.data, "UTF-8");
                 E respond;
                 if (errType==String.class){
                     respond= (E) stringResponse;
@@ -112,8 +122,7 @@ public class JsonRequest<T, E> extends Request<T> {
                     RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
                     responseError.error(error);
                 }
-                Log.d("MSVolley",new String(volleyError.networkResponse.data));
-            } catch (JsonParseException e){
+            } catch (JsonParseException | UnsupportedEncodingException e){
                 localError.error(e.toString());
             }
 

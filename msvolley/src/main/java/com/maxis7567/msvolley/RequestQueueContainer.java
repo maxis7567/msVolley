@@ -15,11 +15,19 @@ public class RequestQueueContainer {
         }
         return requestQueueContainer;
     }
-    public static void ResetQueue(String tag){
-        requestQueueContainer.cancelAll(tag);
+    public static void removeFromQueue(Context context,Object tag){
+        getRequestQueueContainer(context).cancelAll(tag);
     }
     public static void add(Context context, Request jsonRequest, LocalError localError){
         if (NetworkCheck.isNetworkAvailable(context)){
+            getRequestQueueContainer(context).add(jsonRequest);
+        }else {
+            localError.error("network not available");
+        }
+    }
+    public static void addSingleInstance(Context context, Request jsonRequest, LocalError localError){
+        if (NetworkCheck.isNetworkAvailable(context)){
+            removeFromQueue(context,jsonRequest.getTag().toString());
             getRequestQueueContainer(context).add(jsonRequest);
         }else {
             localError.error("network not available");
