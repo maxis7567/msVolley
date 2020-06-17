@@ -1,7 +1,5 @@
 package com.maxis7567.msvolley;
 
-import com.android.volley.VolleyError;
-
 public class RespondError<E> {
     private String message;
     private int resCode;
