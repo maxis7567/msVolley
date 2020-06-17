@@ -6,6 +6,7 @@ import com.maxis7567.msvolley.JsonRequest;
 import com.maxis7567.msvolley.LocalError;
 import com.maxis7567.msvolley.Response;
 import com.maxis7567.msvolley.ResponseError;
+import com.maxis7567.msvolley.RetryPolicy;
 
 
 import java.util.HashMap;
@@ -16,8 +17,8 @@ public class Api {
         HashMap<String, String> header = new HashMap<>();
         header.put("Accept", "application/json");
         JsonRequest<String, String> getBrand = new JsonRequest<>(context, JsonRequest.POST,
-                null
-                ,"https://bejato.com/api/v1/login", header,
+                new RetryPolicy(5000,0,0)
+                ,"http://10.0.2.2:8080", header,
                 String.class, String.class
                 , DataListener, errorResponseError, localError);
     }

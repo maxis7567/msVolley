@@ -1,7 +1,6 @@
 package com.maxis7567.msvolley;
 
 
-
 import android.content.Context;
 import android.util.Log;
 
@@ -14,7 +13,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.RetryPolicy;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -35,7 +34,9 @@ public class JsonRequest<T, E> extends Request<T> {
     private Type type;
     private Type errType;
 
-    /** Supported request methods. */
+    /**
+     * Supported request methods.
+     */
     public static int DEPRECATED_GET_OR_POST = -1;
     public static int GET = 0;
     public static int POST = 1;
@@ -55,14 +56,15 @@ public class JsonRequest<T, E> extends Request<T> {
         this.localError = localError;
         body = null;
         header = null;
-        if (retryPolicy==null) {
-            this.setRetryPolicy(new DefaultRetryPolicy());
+        this.setRetryPolicy(new DefaultRetryPolicy());
+        if (retryPolicy != null) {
+            this.setRetryPolicy(new DefaultRetryPolicy(retryPolicy.getTimeoutMs(), retryPolicy.getMaxRetries(), retryPolicy.getBackoffMulti()));
         }
-        RequestQueueContainer.add(context,this,localError);
+        RequestQueueContainer.add(context, this, localError);
         Log.d("Api Call", "*********** \n called with: method = [" + method + "]\n, url = [" + url + "]\n, type = [" + type + "]\n, errType = [" + errType + "]");
     }
 
-    public JsonRequest(Context context, int method,  @Nullable RetryPolicy retryPolicy,String url, String body, Type type, Type errType, Response<T> responseListener, ResponseError<E> responseError, LocalError localError) {
+    public JsonRequest(Context context, int method, @Nullable RetryPolicy retryPolicy, String url, String body, Type type, Type errType, Response<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.body = body;
         this.type = type;
@@ -71,11 +73,14 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseError = responseError;
         this.localError = localError;
         header = null;
-        if (retryPolicy==null) {
-            this.setRetryPolicy(new DefaultRetryPolicy());
-        }        RequestQueueContainer.add(context,this,localError);
+        this.setRetryPolicy(new DefaultRetryPolicy());
+        if (retryPolicy != null) {
+            this.setRetryPolicy(new DefaultRetryPolicy(retryPolicy.getTimeoutMs(), retryPolicy.getMaxRetries(), retryPolicy.getBackoffMulti()));
+        }
+        RequestQueueContainer.add(context, this, localError);
         Log.d("Api Call", "*********** \n called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, type = [" + type + "]\n, errType = [" + errType + "]");
     }
+
     public JsonRequest(Context context, int method, @Nullable RetryPolicy retryPolicy, String url, Map<String, String> header, Type type, Type errType, Response<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.header = header;
@@ -84,10 +89,13 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
-        this.setRetryPolicy(new DefaultRetryPolicy(15000,3,2000));
-        RequestQueueContainer.add(context,this,localError);
+        this.setRetryPolicy(new DefaultRetryPolicy());
+        if (retryPolicy != null) {
+            this.setRetryPolicy(new DefaultRetryPolicy(retryPolicy.getTimeoutMs(), retryPolicy.getMaxRetries(), retryPolicy.getBackoffMulti()));
+        }        RequestQueueContainer.add(context, this, localError);
         Log.d("Api Call", "*********** \n called with: method = [" + method + "]\n, url = [" + url + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]");
     }
+
     public JsonRequest(Context context, int method, @Nullable RetryPolicy retryPolicy, String url, String body, Map<String, String> header, Type type, Type errType, Response<T> responseListener, ResponseError<E> responseError, LocalError localError) {
         super(method, url, null);
         this.body = body;
@@ -97,9 +105,11 @@ public class JsonRequest<T, E> extends Request<T> {
         this.responseListener = responseListener;
         this.responseError = responseError;
         this.localError = localError;
-        if (retryPolicy==null) {
-            this.setRetryPolicy(new DefaultRetryPolicy());
-        }        RequestQueueContainer.add(context,this,localError);
+        this.setRetryPolicy(new DefaultRetryPolicy());
+        if (retryPolicy != null) {
+            this.setRetryPolicy(new DefaultRetryPolicy(retryPolicy.getTimeoutMs(), retryPolicy.getMaxRetries(), retryPolicy.getBackoffMulti()));
+        }
+        RequestQueueContainer.add(context, this, localError);
         Log.d("Api Call", "*********** \n called with: method = [" + method + "]\n, url = [" + url + "]\n, body = [" + body + "]\n, header = [" + header + "]\n, type = [" + type + "]\n, errType = [" + errType + "]");
     }
 
@@ -108,72 +118,78 @@ public class JsonRequest<T, E> extends Request<T> {
 
         try {
             String stringResponse = new String(response.data, "UTF-8");
-            Log.d("Api Response","***********\n"+ stringResponse);
+            Log.d("Api Response", "***********\n" + stringResponse);
             T respond;
-            if (type==String.class){
-                respond= (T) stringResponse;
+            if (type == String.class) {
+                respond = (T) stringResponse;
                 return com.android.volley.Response.success(respond, null);
-            }else {
-                respond=gson.fromJson(stringResponse, type);
+            } else {
+                respond = gson.fromJson(stringResponse, type);
                 return com.android.volley.Response.success(respond, null);
             }
 
-        } catch (JsonParseException | UnsupportedEncodingException e){
+        } catch (JsonParseException | UnsupportedEncodingException e) {
             localError.error(e.toString());
             return null;
         }
     }
+
     @Override
     protected VolleyError parseNetworkError(VolleyError volleyError) {
-        if (volleyError.networkResponse!=null) {
+        if (volleyError.networkResponse != null) {
             String stringResponse;
-            Log.d("Api Response","***********\n"+new String(volleyError.networkResponse.data));
+            Log.d("Api Response", "***********\n" + new String(volleyError.networkResponse.data));
             try {
                 stringResponse = new String(volleyError.networkResponse.data, "UTF-8");
                 E respond;
-                if (errType==String.class){
-                    respond= (E) stringResponse;
-                    RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
+                if (errType == String.class) {
+                    respond = (E) stringResponse;
+                    RespondError<E> error = new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode, respond);
                     responseError.error(error);
-                }else {
-                    respond=gson.fromJson(stringResponse, errType);
-                    RespondError<E> error= new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode,respond);
+                } else {
+                    respond = gson.fromJson(stringResponse, errType);
+                    RespondError<E> error = new RespondError<>(volleyError.getMessage(), volleyError.networkResponse.statusCode, respond);
                     responseError.error(error);
                 }
-            } catch (JsonParseException | UnsupportedEncodingException e){
+            } catch (JsonParseException | UnsupportedEncodingException e) {
                 localError.error(e.toString());
             }
 
 
-        }else {
+        } else {
+            if (volleyError instanceof TimeoutError){
+                localError.error("TimeoutError");
+            }else if (volleyError.getMessage()!=null){
+                localError.error(volleyError.getMessage());
+            }else
             localError.error("network not available");
         }
         return null;
     }
+
     @Override
     protected void deliverResponse(T response) {
-        if (response!=null) {
+        if (response != null) {
             responseListener.respond(response);
         }
     }
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
-        if(header==null){
+        if (header == null) {
             return super.getHeaders();
-        }else
+        } else
             return header;
     }
 
     @Override
     public byte[] getBody() throws AuthFailureError {
-        if(body==null) {
+        if (body == null) {
             return super.getBody();
-        }else
+        } else
             return body.getBytes();
 
     }
-
 
 
 }
